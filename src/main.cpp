@@ -141,14 +141,8 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("Verbunden ....");
       // ... and resubscribe
-      client.subscribe("RK_WiFi_003/IN/A");
-      client.subscribe("RK_WiFi_003/IN/B");
-      client.subscribe("RK_WiFi_003/IN/C");
-      client.subscribe("RK_WiFi_003/IN/D");
-      client.subscribe("RK_WiFi_003/IN/E");
-      client.subscribe("RK_WiFi_003/IN/F");
-      client.subscribe("RK_WiFi_003/IN/G");
-      client.subscribe("RK_WiFi_003/IN/H");          
+   
+      client.subscribe("Vorbau/Relaiskarte/IN/1");        
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -163,152 +157,23 @@ void reconnect() {
 void callback(char* topic, byte* payload, unsigned int length) {
 
 
-    if (strcmp(topic,"RK_WiFi_003/IN/A")==0) {
+    if (strcmp(topic,"Vorbau/Relaiskarte/IN/1")==0) {
 
         // Kanal A
         if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_A -> AN");
+                 Serial.println("Vorbau_Relais Kanal A -> AN");
                  pcf8574.digitalWrite(P0, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/A","on");
+                 //client.publish("Vorbau/Relaiskarte/IN/1","on");
                 delay(100);
               }
 
         if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_A -> AUS");
+                 Serial.println("Vorbau_Relais Kanal A -> AUS");
                  pcf8574.digitalWrite(P0, !LOW);
-                 client.publish("RK_WiFi_003/OUT/A","off");
+                 //client.publish("Vorbau/Relaiskarte/IN/1","off");
                 delay(100);
               }
       } 
 
 
-
-    if (strcmp(topic,"RK_WiFi_003/IN/B")==0) {
-
-        // Kanal B
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_B -> AN");
-                 pcf8574.digitalWrite(P1, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/B","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_B -> AUS");
-                  pcf8574.digitalWrite(P1, !LOW);
-                 client.publish("RK_WiFi_003/OUT/B","off");
-                delay(100);
-              }
-      }      
-
-
-    if (strcmp(topic,"RK_WiFi_003/IN/C")==0) {
-
-        // Kanal C
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_C -> AN");
-                  pcf8574.digitalWrite(P2, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/C","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 //digitalWrite(relais_A, !LOW);
-                 Serial.println("relais_C -> AUS");
-                 pcf8574.digitalWrite(P2, !LOW);
-                 client.publish("RK_WiFi_003/OUT/C","off");
-                delay(100);
-              }
-      }
-
-
-    if (strcmp(topic,"RK_WiFi_003/IN/D")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_D -> AN");
-                 pcf8574.digitalWrite(P3, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/D","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_D -> AUS");
-                 pcf8574.digitalWrite(P3, !LOW);
-                 client.publish("RK_WiFi_003/OUT/D","off");
-                delay(100);
-              }
-      }
-
-    if (strcmp(topic,"RK_WiFi_003/IN/E")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_E -> AN");
-                 pcf8574.digitalWrite(P4, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/E","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_E -> AUS");
-                 pcf8574.digitalWrite(P4, !LOW);
-                 client.publish("RK_WiFi_003/OUT/E","off");
-                delay(100);
-              }
-      }      
-
-    if (strcmp(topic,"RK_WiFi_003/IN/F")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_F -> AN");
-                 pcf8574.digitalWrite(P5, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/F","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_F -> AUS");
-                 pcf8574.digitalWrite(P5, !LOW);
-                 client.publish("RK_WiFi_003/OUT/F","off");
-                delay(100);
-              }
-      }    
-
-    if (strcmp(topic,"RK_WiFi_003/IN/G")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_G -> AN");
-                 pcf8574.digitalWrite(P6, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/G","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_G -> AUS");
-                 pcf8574.digitalWrite(P6, !LOW);
-                 client.publish("RK_WiFi_003/OUT/G","off");
-                delay(100);
-              }
-      } 
-
-    if (strcmp(topic,"RK_WiFi_003/IN/H")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_H -> AN");
-                 pcf8574.digitalWrite(P7, !HIGH);
-                 client.publish("RK_WiFi_003/OUT/H","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_H -> AUS");
-                 pcf8574.digitalWrite(P7, !LOW);
-                 client.publish("RK_WiFi_003/OUT/H","off");
-                delay(100);
-              }
-      } 
 }
