@@ -27,13 +27,19 @@ void mqbstt_callback_aufrufen   ();
 unsigned long previousMillis_mqtt_callback = 0; // Spannung Messen
 unsigned long interval_mqtt_callback = 100; 
 
-// Kartendaten
+unsigned long previousMillis_abfrage_tuerklingel = 0; // Spannung Messen
+unsigned long interval_abfrage_tuerklingel = 500; 
+
+/////////////////////////////////////////////////////////////////////////// PIN zuweisen
+int tuerklingel =  D7;
+
+/////////////////////////////////////////////////////////////////////////// Kartendaten
 const char* kartenID = "Vorbau_Relaiskarte";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// Connect to the WiFi
+/////////////////////////////////////////////////////////////////////////// Connect to the WiFi
 const char* ssid = "GuggenbergerLinux";
 const char* password = "Isabelle2014samira";
 const char* mqtt_server = "192.168.150.1";
@@ -81,7 +87,7 @@ void setup() {
   pcf8574.pinMode(P6, OUTPUT);
   pcf8574.pinMode(P7, OUTPUT);        
   pcf8574.begin();
-/////////////////////////////////////////////////////////////////////////// 
+
 
 /////////////////////////////////////////////////////////////////////////// Relais OFF
 pcf8574.digitalWrite(P0, !LOW);
@@ -92,7 +98,10 @@ pcf8574.digitalWrite(P4, !LOW);
 pcf8574.digitalWrite(P5, !LOW);
 pcf8574.digitalWrite(P6, !LOW);
 pcf8574.digitalWrite(P7, !LOW);
-/////////////////////////////////////////////////////////////////////////// 
+
+// Sturmschutzschalter init
+pinMode(tuerklingel, INPUT);
+
 
 // MQTT Broker
   client.setServer(mqtt_server, 1883);
@@ -103,6 +112,21 @@ pcf8574.digitalWrite(P7, !LOW);
 
 //*********************************************** Wifi Setup
 wifi_setup();
+
+}
+
+/////////////////////////////////////////////////////////////////////////// Türklingel abfragen 
+void abfragen_tuerklingel() {
+
+  // Schalter abfragen
+  	while( digitalRead(tuerklingel) == 1 ) //while the button is pressed
+      {
+        //blink
+        Serial.println("Türklingel gedrückt");
+        client.publish("Haustuer/taster", "1");
+        delay(2000);
+        client.publish("Haustuer/taster", "0");
+      } 
 
 }
 
@@ -124,6 +148,14 @@ void loop() {
       Serial.println("mqtt Callback aufrufen");
       mqtt_callback_aufrufen();
     } 
+
+   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Tuerklingel abfragen
+  if (millis() - previousMillis_abfrage_tuerklingel> interval_abfrage_tuerklingel) {
+      previousMillis_abfrage_tuerklingel= millis(); 
+      // Prüfen der Panelenspannung
+      Serial.println("Tuerklingel abfragen");
+      abfragen_tuerklingel();
+    }     
   
 }
 
@@ -142,7 +174,14 @@ void reconnect() {
       Serial.println("Verbunden ....");
       // ... and resubscribe
    
-      client.subscribe("Vorbau/Relaiskarte/IN/1");        
+      client.subscribe("Vorbau/Relaiskarte/IN/1");     
+      client.subscribe("Vorbau/Relaiskarte/IN/2");     
+      client.subscribe("Vorbau/Relaiskarte/IN/3");     
+      client.subscribe("Vorbau/Relaiskarte/IN/4");     
+      client.subscribe("Vorbau/Relaiskarte/IN/5");     
+      client.subscribe("Vorbau/Relaiskarte/IN/6");     
+      client.subscribe("Vorbau/Relaiskarte/IN/7");     
+      client.subscribe("Vorbau/Relaiskarte/IN/8");     
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -161,19 +200,128 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
         // Kanal A
         if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("Vorbau_Relais Kanal A -> AN");
+                 Serial.println("Vorbau_Relais Kanal 1 -> AN");
                  pcf8574.digitalWrite(P0, !HIGH);
                  //client.publish("Vorbau/Relaiskarte/IN/1","on");
                 delay(100);
               }
 
         if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("Vorbau_Relais Kanal A -> AUS");
+                 Serial.println("Vorbau_Relais Kanal 1 -> AUS");
                  pcf8574.digitalWrite(P0, !LOW);
                  //client.publish("Vorbau/Relaiskarte/IN/1","off");
                 delay(100);
               }
       } 
 
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/2")==0) {
 
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 2 -> AN");
+                 pcf8574.digitalWrite(P1, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 2 -> AUS");
+                 pcf8574.digitalWrite(P1, !LOW);
+                delay(100);
+              }
+      } 
+
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/3")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 3 -> AN");
+                 pcf8574.digitalWrite(P2, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 3 -> AUS");
+                 pcf8574.digitalWrite(P2, !LOW);
+                delay(100);
+              }
+      } 
+
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/4")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 4 -> AN");
+                 pcf8574.digitalWrite(P3, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 4 -> AUS");
+                 pcf8574.digitalWrite(P3, !LOW);
+                delay(100);
+              }
+      }       
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/5")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 5 -> AN");
+                 pcf8574.digitalWrite(P4, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 5 -> AUS");
+                 pcf8574.digitalWrite(P4, !LOW);
+                delay(100);
+              }
+      } 
+
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/6")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 6 -> AN");
+                 pcf8574.digitalWrite(P5, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 6 -> AUS");
+                 pcf8574.digitalWrite(P5, !LOW);
+                delay(100);
+              }
+      } 
+
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/7")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 7 -> AN");
+                 pcf8574.digitalWrite(P6, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 7 -> AUS");
+                 pcf8574.digitalWrite(P6, !LOW);
+                delay(100);
+              }
+      } 
+
+          if (strcmp(topic,"Vorbau/Relaiskarte/IN/8")==0) {
+
+        // Kanal A
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
+                 Serial.println("Vorbau_Relais Kanal 8 -> AN");
+                 pcf8574.digitalWrite(P7, !HIGH);
+                delay(100);
+              }
+
+        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
+                 Serial.println("Vorbau_Relais Kanal 8 -> AUS");
+                 pcf8574.digitalWrite(P7, !LOW);
+                delay(100);
+              }
+      } 
 }
