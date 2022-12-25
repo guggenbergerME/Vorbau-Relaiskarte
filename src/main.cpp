@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h> 
 #include <PubSubClient.h>  
 #include <OneWire.h>
+#include <ArduinoOTA.h>
 
 ////////////////////////////////////////////////////////////////////// PCF8574 Adresse
 PCF8574 pcf8574(0x20);
@@ -77,6 +78,11 @@ void wifi_setup() {
 //////////////////////////////////////////////////////////////////////////////////   SETUP
 void setup() {
 
+ /////////////////////////////////////////////////////////////////////////// OTA Setup für Firmware
+  ArduinoOTA.setHostname("Terrassenlicht");
+  ArduinoOTA.setPassword("kZm45YWFzZmxrc2Ega");
+  ArduinoOTA.begin();  
+
 /////////////////////////////////////////////////////////////////////////// Konfig Relais
   pcf8574.pinMode(P0, OUTPUT);
   pcf8574.pinMode(P1, OUTPUT);
@@ -126,7 +132,7 @@ void abfragen_tuerklingel() {
         client.publish("Haustuer/taster", "1");
         client.publish("Vorbau/Relaiskarte/IN/1","on");
         pcf8574.digitalWrite(P0, !HIGH);
-        delay(2000);
+        delay(1000);
         client.publish("Haustuer/taster", "0");
         client.publish("Vorbau/Relaiskarte/IN/1","off");
         pcf8574.digitalWrite(P0, !LOW);
@@ -144,6 +150,9 @@ void mqtt_callback_aufrufen() {
 
 //////////////////////////////////////////////////////////////////////////////////   LOOP
 void loop() {
+
+  // OTA Handle starten
+  ArduinoOTA.handle();    
 
    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ mqtt Callback aufrufen
   if (millis() - previousMillis_mqtt_callback> interval_mqtt_callback) {
