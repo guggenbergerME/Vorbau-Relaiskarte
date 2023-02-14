@@ -29,7 +29,7 @@ unsigned long previousMillis_mqtt_callback = 0; // Spannung Messen
 unsigned long interval_mqtt_callback = 100; 
 
 unsigned long previousMillis_abfrage_tuerklingel = 0; // Spannung Messen
-unsigned long interval_abfrage_tuerklingel = 350; 
+unsigned long interval_abfrage_tuerklingel = 150; 
 
 /////////////////////////////////////////////////////////////////////////// PIN zuweisen
 int tuerklingel =  D7;
@@ -131,6 +131,16 @@ void abfragen_tuerklingel() {
         Serial.println("Türklingel gedrückt");
         client.publish("Haustuer/taster", "1");
         client.publish("Vorbau/Relaiskarte/IN/1","on");
+
+      // Türklingel 3 mal klingeln lassen
+      for (int zaehler=1; zaehler<4; zaehler = zaehler+1){
+        pcf8574.digitalWrite(P0, !HIGH);
+        delay(300);
+        pcf8574.digitalWrite(P0, !LOW);
+        delay(900);
+      }
+
+
         pcf8574.digitalWrite(P0, !HIGH);
         delay(1000);
         client.publish("Haustuer/taster", "0");
